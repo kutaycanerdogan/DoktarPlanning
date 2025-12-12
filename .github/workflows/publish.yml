@@ -1,0 +1,33 @@
+name: Publish - Build & Artifact
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore
+      run: dotnet restore DoktarPlanning.Api/DoktarPlanning.Api.csproj
+
+    - name: Build
+      run: dotnet build DoktarPlanning.Api/DoktarPlanning.Api.csproj --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish DoktarPlanning.Api/DoktarPlanning.Api.csproj -c Release -o ./publish
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: doktarplanning-api
+        path: ./publish

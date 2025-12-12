@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="DoktarPlanning.Api/DoktarPlanning.Api.csproj" />
+  <Project Path="DoktarPlanning.Application/DoktarPlanning.Application.csproj" />
+  <Project Path="DoktarPlanning.Data/DoktarPlanning.Data.csproj" />
+  <Project Path="DoktarPlanning.Domain/DoktarPlanning.Domain.csproj" />
+  <Project Path="DoktarPlanning.Infrastructure/DoktarPlanning.Infrastructure.csproj" />
+  <Project Path="DoktarPlanning.Tests/DoktarPlanning.Tests.csproj" />
+</Solution>

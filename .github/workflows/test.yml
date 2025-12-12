@@ -1,0 +1,53 @@
+name: CI - Build & Test
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+  push:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore
+      run: dotnet restore DoktarPlanning.Tests/DoktarPlanning.Tests.csproj
+
+    - name: Build
+      run: dotnet build DoktarPlanning.Tests/DoktarPlanning.Tests.csproj --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test DoktarPlanning.Tests/DoktarPlanning.Tests.csproj \
+            --collect:"XPlat Code Coverage" \
+            --logger "trx;LogFileName=test_results.trx" \
+            --results-directory ./test-results
+
+    - name: Publish Test Report
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: test-results/*.trx
+        reporter: dotnet-trx
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: test-results/**/coverage.cobertura.xml
+
+    - name: Summary
+      run: |
+        echo "## ✅ Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Total tests: $(grep -o '<UnitTestResult ' test-results/test_results.trx | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- Passed: $(grep -o 'outcome=\"Passed\"' test-results/test_results.trx | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- Failed: $(grep -o 'outcome=\"Failed\"' test-results/test_results.trx | wc -l)" >> $GITHUB_STEP_SUMMARY
